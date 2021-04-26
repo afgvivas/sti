@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, StatusBar, Button, ScrollView } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, StatusBar, Button, ScrollView, Alert } from 'react-native';
 import Auth from './src/components/Auth';
 import {decode, encode} from 'base-64';
 //import Principal from './src/components/Principal';
@@ -21,7 +21,7 @@ export default function App() {
 
   const [user, setUser] = useState(undefined);
   const [emailToShow, setEmailToShow] = useState();
-
+ 
   
 
 
@@ -57,6 +57,19 @@ function Logout(props) {
     firebase.auth().signOut();
   }
   //this.updateState = this.updateState.bind(this);
+  const and = [];
+  let a = 0;
+  let b= 0;
+  let mayor = '';
+  let c = 0;
+  const[TA, setTA] = useState(0);
+  const[TB, setTB] = useState(0);
+  const[TC, setTC] = useState(0); 
+  const[uniqueShuffle, setUniqueShuffle] = useState(0);
+  const[arrayLength, setArrayLength] = useState(0);
+
+  const[calculateStyleEnable, setCalculateStyleEnable] = useState(true);
+  //calculateStyleEnable = true;
   const[questions, setQuestions] = useState([]);
   const[Dquestions, setDQuestions] = useState([]);
   const[Danswers, setDAnswers] = useState([]);
@@ -95,14 +108,41 @@ function Logout(props) {
       setQuestions(itemsArray);
       console.error(`haber ${itemsArray}`);
       console.warn(`haber ${questions}`);
-      if(questions !== undefined || questions !== null){
-        setDQuestions(questions);
+      //----------------------------------------------------------------
+      let arrayTemp = [];
+      arrayTemp = questions;
+      
+      let i = arrayTemp.length - 1;
+        for (; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = arrayTemp[i];
+        arrayTemp[i] = arrayTemp[j];
+        arrayTemp[j] = temp;
+        }
+
+      //----------------------------------------------------------------
+      if(arrayTemp !== undefined || arrayTemp !== null){
+        setDQuestions(arrayTemp);
       }
+      console.log("alalala");
       console.log(Dquestions);
+
+      //-------------------------------------------------------------------------------------
+      
+      //setDQuestions(random_item(questions));
+      
+      //-------------------------------------------------------------------------------------
+
+
     });
     
   }, []);
-
+  function random_item(items)
+  {
+    
+  return items[Math.floor(Math.random()*items.length)];
+       
+  }
   //state = { ans: '' }
     
    /* const handleAnswer = (ansValue) => {
@@ -111,20 +151,113 @@ function Logout(props) {
         Danswers.push(ansValue);
         console.log(Danswers);
     } */
+    const changeValue = (value) => {
+      setUniqueShuffle(value+1);
+    }
 
-  
+    const createTwoButtonAlert = (message) =>
+    Alert.alert(
+      "Su estilo es:",
+      `${message}`,
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => console.log("OK Pressed") }
+      ]
+    );
+
+    const getAnswer = (answer) => {
+      console.log(`retornando ${JSON.stringify(answer)}`);
+      console.log(`retornando ${answer.pregunta}`);
+      console.log(`retornando ${answer.numero}`);
+      console.warn(answer.respuesta);
+      answer.respuesta === 0 ? setTA(TA+1) : setTB(TB+1);
+      console.warn(a);
+      console.warn(b);
+
+      /* setDAnswers(answer);
+      console.log(`retornandoarreglo:  ${JSON.stringify(Danswers)}`); */
+      and[answer.numero-1] = answer;
+      setArrayLength(arrayLength+1);
+      console.log(`arrraylenght tiene ${arrayLength}`);
+      if(answer.numero === 3) console.log(`posicion 1 ${JSON.stringify(and[0])}  posicion 2 ${JSON.stringify(and[1])}  posicion 3 ${JSON.stringify(and[2])}`);
+      console.error(and.length);
+      arrayLength == 10 ? setCalculateStyleEnable(false) : setCalculateStyleEnable(true);
+      console.error(calculateStyleEnable);
+      
+      /* if(and.length >= 11){
+        if(a > b){
+          c = a - b;
+          mayor = "Estilo Visual";
+        }
+        else if(b > a){
+          c = b - a;
+          mayor = "Estilo Verbal";
+        }
+        else{
+          console.error("indeterminante.... A no puede valer lo mismo que B")
+        }
+        getLearningStyle(c, mayor);
+      } */
+  }
+
+  const calculateStyle = () => {
+    //console.error(`la mierda tiene ${this.a} y ${this.b}`);
+    let x=TA;
+    let y=TB;
+    if(x > y){
+      c = x - y;
+      mayor = "Estilo Visual";
+    }
+    if(y > x){
+      c = y - x;
+      mayor = "Estilo Verbal";
+    }
+    if(x == y){
+      console.warn(`X vale ${x}`);
+      console.warn(`Y vale ${Y}`);
+      console.error("indeterminante.... A no puede valer lo mismo que B")
+    }
+    console.warn(`X vale ${x}`);
+    console.warn(`Y vale ${y}`);
+    getLearningStyle(c, mayor);
+    
+  }
+
+  const getLearningStyle = (c, mayor) => {
+    console.warn(`c vale ${c}`);
+    console.warn(`mayor vale ${mayor}`);
+    c >= 1 && c <= 4 ? createTwoButtonAlert(`Equilibrio entre los 2 extremos`):null;
+    c >= 5 && c <= 8 ? createTwoButtonAlert(`Preferencia moderada hacia ${mayor}`):null;
+    c >= 9 && c <= 11 ? createTwoButtonAlert(`Preferencia muy fuerte hacia ${mayor}`):null;
+
+  }
+
   return (
     <View>
-      <Text style={{ fontSize: 16, }}>Logueado como: {props.text}</Text>
+      <Text style={{ fontSize: 16, paddingLeft: 24}}>Logueado como: {props.text}</Text>
       
       <ScrollView style={styles.ScrollView}>
         {/* <Questions /> */}
         {Dquestions.map((item, index) => (
-          <Questions key={index} Dquestions={item} />
-          
+          <View>   
+            <Questions key={index} Dquestions={item} order={index} uniqueShuffle={uniqueShuffle} getAnswer={getAnswer} changeValue={changeValue} />
+            <View
+              style={{
+              borderBottomColor: 'black',
+              borderBottomWidth: 1,
+              }}
+            />
+          </View>  
         ))}
+        <Button title='Determinar estilo' onPress={calculateStyle} disabled={calculateStyleEnable}></Button>
+        <Button title='cerrar sesion' onPress={logout}></Button>
+        <Button title='' onPress={logout}></Button>
       </ScrollView>
-      <Button title='cerrar sesion' onPress={logout}></Button>
+      
     </View>
   )
 }
@@ -134,5 +267,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     //backgroundColor: '#15212b',
     height: '100%',
+  },
+  separator: {
+    
   }
 })
