@@ -1,23 +1,44 @@
-import React, {useState} from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Button } from 'react-native';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 
-export default function Auth(){
+
+import YoutubePlayer from 'react-native-youtube-iframe';
+
+export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
+
+
+    const [playing, setPlaying] = useState(false);
 
     const changeForm = () => {
         console.warn(isLogin);
         setIsLogin(!isLogin);
     }
 
-    return(
+    const togglePlaying = useCallback(() => {
+        setPlaying((prev) => !prev);
+    }, []);
+
+    return (
         <View style={styles.view}>
+
+            <YoutubePlayer
+                height={400}
+                width={400}
+                play={playing}
+                videoId={"X-RoXqCoHK0"}
+            />
+
+            <Button title={playing ? "pause" : "play"} onPress={togglePlaying} />
+
+
             <Image style={styles.logo} source={require('../assets/logoV1.jpg')} />
             {isLogin ? (
-                <LoginForm changeForm={changeForm}/>
+                <LoginForm changeForm={changeForm} />
             ) : (
-                <RegisterForm changeForm={changeForm}/>
+                <RegisterForm changeForm={changeForm} />
             )}
         </View>
     );
@@ -25,7 +46,7 @@ export default function Auth(){
 
 const styles = StyleSheet.create({
     view: {
-        backgroundColor: "black",
+        // backgroundColor: "black",
         flex: 1,
         alignItems: 'center',
     },
