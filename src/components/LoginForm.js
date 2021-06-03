@@ -35,8 +35,7 @@ export default function LoginForm(props) {
     };
 
     const onChange = (e, type) => {
-        console.log('data: ', e.nativeEvent.text);
-        console.log('type: ', type);
+ 
         setFormData({
             ...formData, [type]: e.nativeEvent.text
         });

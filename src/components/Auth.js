@@ -25,13 +25,14 @@ export default function Auth(){
 
 const styles = StyleSheet.create({
     view: {
+        backgroundColor: "black",
         flex: 1,
         alignItems: 'center',
     },
 
     logo: {
-        width: '70%',
-        height: '40%',
+        width: '50%',
+        height: '20%',
         marginTop: 50,
         marginBottom: 50,
         opacity: 0.5,
